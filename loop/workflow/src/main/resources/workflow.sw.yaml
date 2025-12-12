@@ -1,0 +1,141 @@
+id: loop
+name: loop
+version: '0.1.0'
+specVersion: '0.8'
+description: Parallel loop example
+start: entry-event
+
+events:
+  - name: triggerEvent
+    type: http.request.received
+    source: entry-point
+    kind: consumed
+
+# https://sonataflow.org/serverlessworkflow/latest/core/custom-functions-support.html#con-func-knative
+functions:
+  - name: process-event
+    type: expression
+    operation: |
+      {
+        transformed: (
+          (
+            .headers
+            | to_entries
+            | map(select(.key | ascii_downcase != "host"))
+            | map({("HEADER_" + .key): .value})
+            | add
+          ) + .data
+        )
+      }
+  - name: function-d
+    type: custom
+    operation: knative:services.v1.serving.knative.dev/function-d?method=POST
+  - name: result
+    type: custom
+    operation: knative:services.v1.serving.knative.dev/result?method=POST
+  - name: merge-results
+    type: expression
+    operation: |
+      def deepmerge($a; $b):
+        if $a == null then $b
+        elif $b == null then $a
+        elif $b | type == "object" then
+          reduce ($b | to_entries[]) as $kv ($a;
+            .[$kv.key] = deepmerge(.[$kv.key]; $kv.value)
+          )
+        elif $b | type == "array" then
+          if $a | type == "array" then
+            ($a | length) as $la |
+            ($b | length) as $lb |
+            # length of the shorter array
+            (if $la < $lb then $la else $lb end) as $minlen |
+
+            # accumulate contiguous common prefix
+            reduce range(0; $minlen) as $i (
+              { ok: true, prefix: [] };
+              if .ok and ($a[$i] == $b[$i]) then
+                { ok: true, prefix: (.prefix + [$a[$i]]) }
+              else
+                { ok: false, prefix: .prefix }
+              end
+            ) as $res |
+
+            ($res.prefix) as $prefix |
+            ($prefix | length) as $pLen |
+
+            # tails after the prefix
+            ([ range($pLen; $la) | $a[.] ]) as $tailA |
+            ([ range($pLen; $lb) | $b[.] ]) as $tailB |
+
+            # final: prefix + tailA + tailB
+            ($prefix + $tailA + $tailB)
+          else
+            $b
+          end
+        else
+          $b
+        end;
+
+      { _result: reduce (to_entries[] | select(.key | startswith("branch-"))) as $item ({};
+          deepmerge(.; $item.value)
+        )
+      }
+
+states:
+  - name: entry-event
+    type: event
+    onEvents:
+      - eventRefs:
+          - triggerEvent
+        actions:
+        - functionRef: process-event
+    stateDataFilter:
+      output: "${ .transformed }"
+    transition: parallel
+  
+  # - name: parallel
+  #   type: operation
+  #   actions:
+  #     - subFlowRef: subloop
+  #       actionDataFilter:
+  #         toStateData: ._result
+  #   stateDataFilter:
+  #     output: ._result
+  #   transition: result
+  
+  - name: parallel
+    type: parallel
+    branches:
+      - name: loop-branch
+        actions:
+          - subFlowRef: subloop
+            actionDataFilter:
+              fromStateData: "${ ._original }"
+              results: "${ {\"branch-loop\": .} }"
+              toStateData: ${ ._result }
+      - name: function-branch
+        actions:
+          - functionRef: function-d
+            actionDataFilter:
+              fromStateData: "${ ._original }"
+              results: "${ {\"branch-function\": .} }"
+              toStateData: ${ ._result }
+    stateDataFilter:
+      input: "${ { _original: . } }"
+      output: ${ ._result }
+    transition: merge-results
+
+  - name: merge-results
+    type: operation
+    actions:
+      - functionRef: merge-results
+    stateDataFilter:
+      output: "${ ._result }"
+    transition: result
+
+  - name: result
+    type: operation
+    actions:
+      - functionRef:
+          refName: result
+    end: true

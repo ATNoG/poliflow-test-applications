@@ -1,0 +1,144 @@
+id: paralllel
+name: paralllel
+version: '0.1.0'
+specVersion: '0.8'
+description: Parallel routing example
+start: entry-event
+
+events:
+  - name: triggerEvent
+    type: http.request.received
+    source: http-event-sources
+    kind: consumed
+
+# TODO -> test for POST
+# https://sonataflow.org/serverlessworkflow/latest/core/custom-functions-support.html#con-func-knative
+functions:
+  - name: function-a
+    type: custom
+    operation: knative:services.v1.serving.knative.dev/function-a?method=POST&returnHeaders=true
+  - name: function-b
+    type: custom
+    operation: knative:services.v1.serving.knative.dev/function-b?method=POST&returnHeaders=true
+  - name: function-c
+    type: custom
+    operation: knative:services.v1.serving.knative.dev/function-c?method=POST&returnHeaders=true
+  # - name: result-2
+  #   type: custom
+  #   operation: knative:services.v1.serving.knative.dev/result-2?method=POST
+  - name: result
+    type: custom
+    operation: knative:services.v1.serving.knative.dev/result?method=POST
+  - name: process-event
+    type: expression
+    operation: |
+      {
+        transformed: (
+          (
+            .headers
+            | to_entries
+            | map(select(.key | ascii_downcase != "host"))
+            | map({("HEADER_" + .key): .value})
+            | add
+          ) + .data
+        )
+      }
+  - name: merge-results
+    type: expression
+    operation: |
+      def deepmerge($a; $b):
+        if $a == null then $b
+        elif $b == null then $a
+        elif $b | type == "object" then
+          reduce ($b | to_entries[]) as $kv ($a;
+            .[$kv.key] = deepmerge(.[$kv.key]; $kv.value)
+          )
+        elif $b | type == "array" then
+          if $a | type == "array" then
+            ($a + $b) | unique
+          else
+            $b
+          end
+        else
+          $b
+        end;
+
+      { _result: reduce (to_entries[] | select(.key | startswith("branch-"))) as $item ({};
+          deepmerge(.; $item.value)
+        )
+      }
+
+states:
+  - name: entry-event
+    type: event
+    onEvents:
+      - eventRefs:
+          - triggerEvent
+        actions:
+        - functionRef:
+            refName: process-event
+    stateDataFilter:
+      output: "${ .transformed }"
+    transition: function-a
+
+  # - name: entry-event
+  #   type: event
+  #   onEvents:
+  #     - eventRefs:
+  #         - triggerEvent
+  #       actionMode: sequential
+  #       eventDataFilter:
+  #         data: "${ . }"
+  #   transition: function-a
+
+  - name: function-a
+    type: operation
+    actions:
+      - functionRef:
+          refName: function-a
+    transition: parallel
+
+  - name: parallel
+    type: parallel
+    branches:
+      - name: branch-b
+        actions:
+          - functionRef:
+              refName: function-b
+            actionDataFilter:
+              fromStateData: "${ ._original }"
+              results: "${ {\"branch-b\": .} }"
+      - name: branch-c
+        actions:
+          - functionRef:
+              refName: function-c
+            actionDataFilter:
+              fromStateData: "${ ._original }"
+              results: "${ {\"branch-c\": .} }"
+      # - name: branch-d
+      #   actions:
+      #     - functionRef:
+      #         refName: result-2
+      #         arguments:
+      #           HEADER_test: HUEHUE
+      #       actionDataFilter:
+      #         fromStateData: "${ ._original }"
+      #         results: "${ {\"branch-d\": .} }"
+    stateDataFilter:
+      input: "${ { _original: . } }"
+    transition: merge-results
+
+  - name: merge-results
+    type: operation
+    actions:
+      - functionRef: merge-results
+    stateDataFilter:
+      output: "${ ._result }"
+    transition: result
+
+  - name: result
+    type: operation
+    actions:
+      - functionRef:
+          refName: result
+    end: true

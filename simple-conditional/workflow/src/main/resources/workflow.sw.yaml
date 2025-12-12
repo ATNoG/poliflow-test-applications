@@ -1,0 +1,77 @@
+id: conditional
+name: conditional
+version: '0.1.0'
+specVersion: '0.8'
+description: Conditional routing example
+start: entry-event
+
+events:
+  - name: triggerEvent
+    type: http.request.received
+    source: http-event-sources
+    kind: consumed
+
+# https://sonataflow.org/serverlessworkflow/latest/core/custom-functions-support.html#con-func-knative
+functions:
+  - name: function-a
+    type: custom
+    operation: knative:services.v1.serving.knative.dev/function-a?method=GET
+  - name: function-b
+    type: custom
+    operation: knative:services.v1.serving.knative.dev/function-b?method=GET
+  - name: function-c
+    type: custom
+    operation: knative:services.v1.serving.knative.dev/function-c?method=GET
+
+states:
+  - name: entry-event
+    type: event
+    onEvents:
+      - eventRefs:
+          - triggerEvent
+        actionMode: sequential
+        eventDataFilter:
+          data: "${ . }"
+    transition: validate
+  - name: validate
+    type: switch
+    dataConditions:
+      - condition: "${ .data != null and (.data == true or .data == false) }"
+        transition: function-a
+    defaultCondition: 
+      end: true
+    
+  - name: function-a
+    type: operation
+    actions:
+      - functionRef:
+          refName: function-a
+          arguments: 
+            value: "${ .data }"
+    stateDataFilter:
+      output: "${ { result: .value } }"
+    transition: decide
+
+  - name: decide
+    type: switch
+    dataConditions:
+      - condition: "${ .result == true }"
+        transition: function-b
+      - condition: "${ .result == false }"
+        transition: function-c
+    defaultCondition:
+      end: true
+
+  - name: function-b
+    type: operation
+    actions:
+      - functionRef:
+          refName: function-b
+    end: true
+
+  - name: function-c
+    type: operation
+    actions:
+      - functionRef:
+          refName: function-c
+    end: true

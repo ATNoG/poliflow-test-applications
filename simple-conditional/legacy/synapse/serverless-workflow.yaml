@@ -1,0 +1,53 @@
+document:
+  dsl: "1.0.0-alpha5"
+  namespace: default
+  name: conditional
+  version: "0.1.0"
+schedule:
+  on:
+    one:
+      with:
+        source: http-event-sources
+  # every:
+  #   seconds: 10
+do:
+  - function-a:
+      call: http
+      with:
+        method: get
+        endpoint: http://function-a.simple-conditional.svc.cluster.local?value=true
+      output:
+        schema:
+          format: json
+          document:
+            type: object
+            properties:
+              result:
+                type: bool
+            required:
+              - result
+        as:
+          result: ${ .result }
+  - decide:
+      switch:
+        - case-true:
+            when: .result == true
+            then: function-b
+        - case-false:
+            when: .result == false
+            then: function-c
+  - function-b:
+      do:
+        - function:
+            call: http
+            with:
+              method: get
+              endpoint: http://function-b.simple-conditional.svc.cluster.local
+      then: exit
+  - function-c:
+      do:
+        - function:
+            call: http
+            with:
+              method: get
+              endpoint: http://function-c.simple-conditional.svc.cluster.local
