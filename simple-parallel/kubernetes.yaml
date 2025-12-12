@@ -1,0 +1,108 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: simple-parallel
+---
+apiVersion: serving.knative.dev/v1
+kind: Service
+metadata:
+  name: entry-point
+  namespace: simple-parallel
+spec:
+  template: 
+    spec:
+      containers:
+        - image: ghcr.io/atnog/poliflow-test-applications/simple-parallel/entry-point
+---
+apiVersion: serving.knative.dev/v1
+kind: Service
+metadata:
+  name: function-a
+  namespace: simple-parallel
+  labels:
+    networking.knative.dev/visibility: cluster-local
+spec:
+  template: 
+    metadata:
+      annotations:
+        qpoption.knative.dev/flow-config-allowed_json_flows: | 
+          [{"type": "sequence", "value": [{"type": "event", "value": {"name": "triggerEvent", "source": "http-event-sources", "type": "http.request.received", "kind": "consumed"}}]}]
+        qpoption.knative.dev/flow-activate: enable
+    spec:
+      containers:
+        - image: ghcr.io/atnog/poliflow-test-applications/simple-parallel/function-a
+---
+apiVersion: serving.knative.dev/v1
+kind: Service
+metadata:
+  name: function-b
+  namespace: simple-parallel
+  labels:
+    networking.knative.dev/visibility: cluster-local
+spec:
+  template: 
+    metadata:
+      annotations:
+        qpoption.knative.dev/flow-config-allowed_json_flows: | 
+          [{"type": "sequence", "value": [{"type": "event", "value": {"name": "triggerEvent", "source": "http-event-sources", "type": "http.request.received", "kind": "consumed"}}, {"type": "function:knative", "value": {"operation": "function-a"}}]}]
+        qpoption.knative.dev/flow-activate: enable
+    spec:
+      containers:
+        - image: ghcr.io/atnog/poliflow-test-applications/simple-parallel/function-b
+---
+apiVersion: serving.knative.dev/v1
+kind: Service
+metadata:
+  name: function-c
+  namespace: simple-parallel
+  labels:
+    networking.knative.dev/visibility: cluster-local
+spec:
+  template:
+    metadata:
+      annotations:
+        qpoption.knative.dev/flow-config-allowed_json_flows: | 
+          [{"type": "sequence", "value": [{"type": "event", "value": {"name": "triggerEvent", "source": "http-event-sources", "type": "http.request.received", "kind": "consumed"}}, {"type": "function:knative", "value": {"operation": "function-a"}}]}]
+        qpoption.knative.dev/flow-activate: enable
+    spec:
+      containers:
+        - image: ghcr.io/atnog/poliflow-test-applications/simple-parallel/function-c
+---
+apiVersion: serving.knative.dev/v1
+kind: Service
+metadata:
+  name: result
+  namespace: simple-parallel
+  labels: 
+    networking.knative.dev/visibility: cluster-local
+spec:
+  template:
+    metadata:
+      annotations:
+        qpoption.knative.dev/flow-activate: enable
+        qpoption.knative.dev/flow-config-allowed_json_flows: | 
+          [{"type":"sequence","value":[{"type":"event","value":{"name":"triggerEvent","source":"http-event-sources","type":"http.request.received","kind":"consumed"}},{"type":"function:knative","value":{"operation":"function-a"}},{"type":"parallel","value":[{"type":"sequence","value":[{"type":"function:knative","value":{"operation":"function-c"}}]},{"type":"sequence","value":[{"type":"function:knative","value":{"operation":"function-b"}}]}]}]}]
+        autoscaling.knative.dev/min-scale: "1"
+        autoscaling.knative.dev/max-scale: "1"
+    spec:
+      containers:
+        - image: ghcr.io/atnog/poliflow-test-applications/simple-parallel/result
+---
+apiVersion: sources.knative.dev/v1
+kind: SinkBinding
+metadata:
+  generation: 1
+  name: bind-entry-point
+  namespace: simple-parallel
+spec:
+  sink: 
+    ref:
+      apiVersion: eventing.knative.dev/v1
+      kind: Broker
+      name: broker
+      namespace: simple-parallel
+  subject:
+    apiVersion: serving.knative.dev/v1
+    kind: Service
+    name: entry-point
+    namespace: simple-parallel

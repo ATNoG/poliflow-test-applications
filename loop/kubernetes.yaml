@@ -1,0 +1,178 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: loop
+---
+apiVersion: serving.knative.dev/v1
+kind: Service
+metadata:
+  name: entry-point
+  namespace: loop
+spec:
+  template:
+    metadata:
+      annotations:
+        autoscaling.knative.dev/min-scale: "1"
+        autoscaling.knative.dev/max-scale: "1"
+    spec:
+      containers:
+        - image: ghcr.io/atnog/poliflow-test-applications/loop/entry-point
+# ---
+# apiVersion: serving.knative.dev/v1
+# kind: Service
+# metadata:
+#   name: function-a
+#   namespace: loop
+#   labels:
+#     networking.knative.dev/visibility: cluster-local
+# spec:
+#   template:
+#     metadata:
+#       annotations:
+#         autoscaling.knative.dev/min-scale: "1"
+#         autoscaling.knative.dev/max-scale: "1"
+#         qpoption.knative.dev/flow-config-allowed_json_flows: | 
+#           [{"type": "sequence", "value": [{"type": "event", "value": {"name": "triggerEvent", "source": "entry-point", "type": "http.request.received", "kind": "consumed"}}, {"type": "function:expression", "value": null}]}]
+#         qpoption.knative.dev/flow-activate: enable
+#     spec:
+#       containers:
+#         - image: ghcr.io/atnog/poliflow-test-applications/loop/sample-function
+---
+apiVersion: serving.knative.dev/v1
+kind: Service
+metadata:
+  name: function-b
+  namespace: loop
+  labels:
+    networking.knative.dev/visibility: cluster-local
+spec:
+  template:
+    metadata:
+      annotations:
+        autoscaling.knative.dev/min-scale: "1"
+        autoscaling.knative.dev/max-scale: "1"
+        qpoption.knative.dev/flow-config-allowed_json_flows: | 
+          [{"type": "sequence", "value": [{"type": "event", "value": {"name": "triggerEvent", "source": "entry-point", "type": "http.request.received", "kind": "consumed"}}, {"type": "function:expression", "value": null}]}]
+        qpoption.knative.dev/flow-activate: enable
+    spec:
+      containers:
+        - image: ghcr.io/atnog/poliflow-test-applications/loop/sample-function
+---
+apiVersion: serving.knative.dev/v1
+kind: Service
+metadata:
+  name: function-c
+  namespace: loop
+  labels:
+    networking.knative.dev/visibility: cluster-local
+spec:
+  template:
+    metadata:
+      annotations:
+        autoscaling.knative.dev/min-scale: "1"
+        autoscaling.knative.dev/max-scale: "1"
+        qpoption.knative.dev/flow-config-allowed_json_flows: | 
+          [{"type": "sequence", "value": [{"type": "event", "value": {"name": "triggerEvent", "source": "entry-point", "type": "http.request.received", "kind": "consumed"}}, {"type": "function:expression", "value": null}, {"type": "function:knative", "value": {"operation": "function-b"}}]}]
+        qpoption.knative.dev/flow-activate: enable
+    spec:
+      containers:
+        - image: ghcr.io/atnog/poliflow-test-applications/loop/sample-function
+---
+apiVersion: serving.knative.dev/v1
+kind: Service
+metadata:
+  name: function-d
+  namespace: loop
+  labels:
+    networking.knative.dev/visibility: cluster-local
+spec:
+  template:
+    metadata:
+      annotations:
+        autoscaling.knative.dev/min-scale: "1"
+        autoscaling.knative.dev/max-scale: "1"
+        qpoption.knative.dev/flow-config-allowed_json_flows: | 
+          [{"type": "sequence", "value": [{"type": "event", "value": {"name": "triggerEvent", "source": "entry-point", "type": "http.request.received", "kind": "consumed"}}, {"type": "function:expression", "value": null}]}]
+        qpoption.knative.dev/flow-activate: enable
+    spec:
+      containers:
+        - image: ghcr.io/atnog/poliflow-test-applications/loop/sample-function
+# ---
+# apiVersion: serving.knative.dev/v1
+# kind: Service
+# metadata:
+#   name: function-e
+#   namespace: loop
+#   labels:
+#     networking.knative.dev/visibility: cluster-local
+# spec:
+#   template:
+#     metadata:
+#       annotations:
+#         autoscaling.knative.dev/min-scale: "1"
+#         autoscaling.knative.dev/max-scale: "1"
+#         qpoption.knative.dev/flow-config-allowed_json_flows: | 
+#           [{"type": "sequence", "value": [{"type": "event", "value": {"name": "triggerEvent", "source": "entry-point", "type": "http.request.received", "kind": "consumed"}}, {"type": "function:expression", "value": null}, {"type": "data_based_switch_state", "value": {"name": "entry-decision", "type": "switch", "dataConditions": [{"condition": "${ .\"postListing\" == true }", "transition": "f1-upload-listing"}, {"condition": "${ .\"submitDoc\" == true }", "transition": "f2-upload-verification"}, {"condition": "${ .\"submitClientInfo\" == true }", "transition": "f3-upload-client"}], "defaultCondition": {"end": true}}}, {"type": "function:knative", "value": {"operation": "f1"}}, {"type": "event", "value": {"trigger": {"name": "uploadPhoto", "type": "photo.database.upload", "kind": "produced"}, "result": {"name": "newPhoto", "source": "database-dummy", "type": "photo.database.new", "kind": "consumed"}}}, {"type": "function:knative", "value": {"operation": "f4"}}]}]
+#         qpoption.knative.dev/flow-activate: enable
+#     spec:
+#       containers:
+#         - image: ghcr.io/atnog/poliflow-test-applications/loop/sample-function
+# ---
+# apiVersion: serving.knative.dev/v1
+# kind: Service
+# metadata:
+#   name: function-f
+#   namespace: loop
+#   labels:
+#     networking.knative.dev/visibility: cluster-local
+# spec:
+#   template:
+#     metadata:
+#       annotations:
+#         autoscaling.knative.dev/min-scale: "1"
+#         autoscaling.knative.dev/max-scale: "1"
+#         qpoption.knative.dev/flow-config-allowed_json_flows: | 
+#           [{"type": "sequence", "value": [{"type": "event", "value": {"name": "triggerEvent", "source": "entry-point", "type": "http.request.received", "kind": "consumed"}}, {"type": "function:expression", "value": null}, {"type": "data_based_switch_state", "value": {"name": "entry-decision", "type": "switch", "dataConditions": [{"condition": "${ .\"postListing\" == true }", "transition": "f1-upload-listing"}, {"condition": "${ .\"submitDoc\" == true }", "transition": "f2-upload-verification"}, {"condition": "${ .\"submitClientInfo\" == true }", "transition": "f3-upload-client"}], "defaultCondition": {"end": true}}}, {"type": "function:knative", "value": {"operation": "f1"}}, {"type": "event", "value": {"trigger": {"name": "uploadPhoto", "type": "photo.database.upload", "kind": "produced"}, "result": {"name": "newPhoto", "source": "database-dummy", "type": "photo.database.new", "kind": "consumed"}}}, {"type": "function:knative", "value": {"operation": "f4"}}, {"type": "function:knative", "value": {"operation": "f5"}}, {"type": "event", "value": {"trigger": {"name": "verification", "type": "info.database.verification", "kind": "produced"}, "result": {"name": "resultVerification", "source": "database-dummy", "type": "info.database.result", "kind": "consumed"}}}, {"type": "function:knative", "value": {"operation": "f7"}}]}]
+#         qpoption.knative.dev/flow-activate: enable
+#     spec:
+#       containers:
+#         - image: ghcr.io/atnog/poliflow-test-applications/loop/sample-function
+---
+apiVersion: serving.knative.dev/v1
+kind: Service
+metadata:
+  name: result
+  namespace: loop
+  labels:
+    networking.knative.dev/visibility: cluster-local
+spec:
+  template:
+    metadata:
+      annotations:
+        autoscaling.knative.dev/min-scale: "1"
+        autoscaling.knative.dev/max-scale: "1"
+        qpoption.knative.dev/flow-config-allowed_json_flows: | 
+          [{"type": "sequence", "value": [{"type": "event", "value": {"name": "triggerEvent", "source": "entry-point", "type": "http.request.received", "kind": "consumed"}}, {"type": "function:expression", "value": null}, {"type": "parallel", "value": [{"type": "sequence", "value": [{"type": "function:knative", "value": {"operation": "function-b"}}, {"type": "function:knative", "value": {"operation": "function-c"}}], "loop": true}, {"type": "sequence", "value": [{"type": "function:knative", "value": {"operation": "function-d"}}]}]}, {"type": "function:expression", "value": null}]}]
+        qpoption.knative.dev/flow-activate: enable
+    spec:
+      containers:
+        - image: ghcr.io/atnog/poliflow-test-applications/loop/result
+---
+apiVersion: sources.knative.dev/v1
+kind: SinkBinding
+metadata:
+  generation: 1
+  name: bind-entry-point
+  namespace: loop
+spec:
+  sink: 
+    ref:
+      apiVersion: eventing.knative.dev/v1
+      kind: Broker
+      name: broker
+      namespace: loop
+  subject:
+    apiVersion: serving.knative.dev/v1
+    kind: Service
+    name: entry-point
+    namespace: loop
