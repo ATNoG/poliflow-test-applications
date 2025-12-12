@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# ghcr.io/atnog/poliflow-test-applications/simple-conditional
+# ghcr.io/<organization>/poliflow-test-applications/simple-conditional
 REGISTRY=10.43.142.183:5000/poliflow-test-applications/simple-conditional
 paths=(function-a function-b function-c entry-point)
 

@@ -43,7 +43,7 @@ spec:
     spec:
       serviceAccountName: workflow
       containers:
-        - image: ghcr.io/atnog/poliflow-test-applications/simple-conditional/workflow
+        - image: ghcr.io/<organization>/poliflow-test-applications/simple-conditional/workflow
           imagePullPolicy: Always
           livenessProbe:
             failureThreshold: 3

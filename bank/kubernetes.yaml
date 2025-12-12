@@ -35,7 +35,7 @@ spec:
         qpoption.knative.dev/flow-activate: enable
     spec:
       containers:
-        - image: ghcr.io/atnog/poliflow-test-applications/bank-app/entry-point
+        - image: ghcr.io/<organization>/poliflow-test-applications/bank-app/entry-point
 ---
 apiVersion: serving.knative.dev/v1
 kind: Service
@@ -50,7 +50,7 @@ spec:
         qpoption.knative.dev/flow-activate: enable
     spec:
       containers:
-        - image: ghcr.io/atnog/poliflow-test-applications/bank-app/login
+        - image: ghcr.io/<organization>/poliflow-test-applications/bank-app/login
           env:
             - name: DIRECTUS_URL
               valueFrom:
@@ -84,7 +84,7 @@ spec:
         qpoption.knative.dev/flow-activate: enable
     spec:
       containers:
-        - image: ghcr.io/atnog/poliflow-test-applications/bank-app/authorization
+        - image: ghcr.io/<organization>/poliflow-test-applications/bank-app/authorization
           env:
             - name: SECRET_KEY
               valueFrom:
@@ -106,7 +106,7 @@ spec:
         qpoption.knative.dev/flow-activate: enable
     spec:
       containers:
-        - image: ghcr.io/atnog/poliflow-test-applications/bank-app/verify-transaction
+        - image: ghcr.io/<organization>/poliflow-test-applications/bank-app/verify-transaction
           env:
             - name: DIRECTUS_URL
               valueFrom:
@@ -143,7 +143,7 @@ spec:
         qpoption.knative.dev/flow-activate: enable
     spec:
       containers:
-        - image: ghcr.io/atnog/poliflow-test-applications/bank-app/transaction
+        - image: ghcr.io/<organization>/poliflow-test-applications/bank-app/transaction
           env:
             - name: DIRECTUS_URL
               valueFrom:
@@ -174,7 +174,7 @@ spec:
         autoscaling.knative.dev/max-scale: "1"
     spec:
       containers:
-        - image: ghcr.io/atnog/poliflow-test-applications/bank-app/result
+        - image: ghcr.io/<organization>/poliflow-test-applications/bank-app/result
 ---
 apiVersion: sources.knative.dev/v1
 kind: SinkBinding

@@ -1,6 +1,6 @@
 #!/bin/bash
 
-REGISTRY=ghcr.io/atnog/poliflow-test-applications/valve
+REGISTRY=ghcr.io/<organization>/poliflow-test-applications/valve
 paths=(entry-point sample-function database-dummy result)
 
 for p in ${paths[@]}; do

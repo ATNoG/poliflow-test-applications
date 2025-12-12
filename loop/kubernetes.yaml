@@ -16,7 +16,7 @@ spec:
         autoscaling.knative.dev/max-scale: "1"
     spec:
       containers:
-        - image: ghcr.io/atnog/poliflow-test-applications/loop/entry-point
+        - image: ghcr.io/<organization>/poliflow-test-applications/loop/entry-point
 # ---
 # apiVersion: serving.knative.dev/v1
 # kind: Service
@@ -36,7 +36,7 @@ spec:
 #         qpoption.knative.dev/flow-activate: enable
 #     spec:
 #       containers:
-#         - image: ghcr.io/atnog/poliflow-test-applications/loop/sample-function
+#         - image: ghcr.io/<organization>/poliflow-test-applications/loop/sample-function
 ---
 apiVersion: serving.knative.dev/v1
 kind: Service
@@ -56,7 +56,7 @@ spec:
         qpoption.knative.dev/flow-activate: enable
     spec:
       containers:
-        - image: ghcr.io/atnog/poliflow-test-applications/loop/sample-function
+        - image: ghcr.io/<organization>/poliflow-test-applications/loop/sample-function
 ---
 apiVersion: serving.knative.dev/v1
 kind: Service
@@ -76,7 +76,7 @@ spec:
         qpoption.knative.dev/flow-activate: enable
     spec:
       containers:
-        - image: ghcr.io/atnog/poliflow-test-applications/loop/sample-function
+        - image: ghcr.io/<organization>/poliflow-test-applications/loop/sample-function
 ---
 apiVersion: serving.knative.dev/v1
 kind: Service
@@ -96,7 +96,7 @@ spec:
         qpoption.knative.dev/flow-activate: enable
     spec:
       containers:
-        - image: ghcr.io/atnog/poliflow-test-applications/loop/sample-function
+        - image: ghcr.io/<organization>/poliflow-test-applications/loop/sample-function
 # ---
 # apiVersion: serving.knative.dev/v1
 # kind: Service
@@ -116,7 +116,7 @@ spec:
 #         qpoption.knative.dev/flow-activate: enable
 #     spec:
 #       containers:
-#         - image: ghcr.io/atnog/poliflow-test-applications/loop/sample-function
+#         - image: ghcr.io/<organization>/poliflow-test-applications/loop/sample-function
 # ---
 # apiVersion: serving.knative.dev/v1
 # kind: Service
@@ -136,7 +136,7 @@ spec:
 #         qpoption.knative.dev/flow-activate: enable
 #     spec:
 #       containers:
-#         - image: ghcr.io/atnog/poliflow-test-applications/loop/sample-function
+#         - image: ghcr.io/<organization>/poliflow-test-applications/loop/sample-function
 ---
 apiVersion: serving.knative.dev/v1
 kind: Service
@@ -156,7 +156,7 @@ spec:
         qpoption.knative.dev/flow-activate: enable
     spec:
       containers:
-        - image: ghcr.io/atnog/poliflow-test-applications/loop/result
+        - image: ghcr.io/<organization>/poliflow-test-applications/loop/result
 ---
 apiVersion: sources.knative.dev/v1
 kind: SinkBinding

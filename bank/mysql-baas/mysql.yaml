@@ -10,7 +10,7 @@ metadata:
   namespace: mysql
 type: kubernetes.io/basic-auth
 stringData:
-  password: olaadeus
+  password: admin
 ---
 apiVersion: v1
 kind: PersistentVolume

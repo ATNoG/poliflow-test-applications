@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # REGISTRY=10.43.142.183:5000/poliflow-test-applications/bank-app
-REGISTRY=ghcr.io/atnog/poliflow-test-applications/bank-app
+REGISTRY=ghcr.io/<organization>/poliflow-test-applications/bank-app
 
 kubectl delete ksvc workflow -n bank-app
 kn workflow quarkus build --image=workflow --jib

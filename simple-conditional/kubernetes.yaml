@@ -12,7 +12,7 @@ spec:
   template: 
     spec:
       containers:
-        - image: ghcr.io/atnog/poliflow-test-applications/simple-conditional/entry-point
+        - image: ghcr.io/<organization>/poliflow-test-applications/simple-conditional/entry-point
 ---
 apiVersion: serving.knative.dev/v1
 kind: Service
@@ -25,7 +25,7 @@ spec:
   template: 
     spec:
       containers:
-        - image: ghcr.io/atnog/poliflow-test-applications/simple-conditional/function-a
+        - image: ghcr.io/<organization>/poliflow-test-applications/simple-conditional/function-a
 ---
 apiVersion: serving.knative.dev/v1
 kind: Service
@@ -38,7 +38,7 @@ spec:
   template: 
     spec:
       containers:
-        - image: ghcr.io/atnog/poliflow-test-applications/simple-conditional/function-b
+        - image: ghcr.io/<organization>/poliflow-test-applications/simple-conditional/function-b
 ---
 apiVersion: serving.knative.dev/v1
 kind: Service
@@ -51,7 +51,7 @@ spec:
   template: 
     spec:
       containers:
-        - image: ghcr.io/atnog/poliflow-test-applications/simple-conditional/function-c
+        - image: ghcr.io/<organization>/poliflow-test-applications/simple-conditional/function-c
 ---
 apiVersion: sources.knative.dev/v1
 kind: SinkBinding

@@ -1,6 +1,6 @@
 #!/bin/bash
 
-REGISTRY=ghcr.io/atnog/poliflow-test-applications/valve
+REGISTRY=ghcr.io/<organization>/poliflow-test-applications/valve
 
 kubectl delete ksvc workflow -n valve
 kn workflow quarkus build --image=workflow --jib

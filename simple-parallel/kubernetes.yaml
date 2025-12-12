@@ -12,7 +12,7 @@ spec:
   template: 
     spec:
       containers:
-        - image: ghcr.io/atnog/poliflow-test-applications/simple-parallel/entry-point
+        - image: ghcr.io/<organization>/poliflow-test-applications/simple-parallel/entry-point
 ---
 apiVersion: serving.knative.dev/v1
 kind: Service
@@ -30,7 +30,7 @@ spec:
         qpoption.knative.dev/flow-activate: enable
     spec:
       containers:
-        - image: ghcr.io/atnog/poliflow-test-applications/simple-parallel/function-a
+        - image: ghcr.io/<organization>/poliflow-test-applications/simple-parallel/function-a
 ---
 apiVersion: serving.knative.dev/v1
 kind: Service
@@ -48,7 +48,7 @@ spec:
         qpoption.knative.dev/flow-activate: enable
     spec:
       containers:
-        - image: ghcr.io/atnog/poliflow-test-applications/simple-parallel/function-b
+        - image: ghcr.io/<organization>/poliflow-test-applications/simple-parallel/function-b
 ---
 apiVersion: serving.knative.dev/v1
 kind: Service
@@ -66,7 +66,7 @@ spec:
         qpoption.knative.dev/flow-activate: enable
     spec:
       containers:
-        - image: ghcr.io/atnog/poliflow-test-applications/simple-parallel/function-c
+        - image: ghcr.io/<organization>/poliflow-test-applications/simple-parallel/function-c
 ---
 apiVersion: serving.knative.dev/v1
 kind: Service
@@ -86,7 +86,7 @@ spec:
         autoscaling.knative.dev/max-scale: "1"
     spec:
       containers:
-        - image: ghcr.io/atnog/poliflow-test-applications/simple-parallel/result
+        - image: ghcr.io/<organization>/poliflow-test-applications/simple-parallel/result
 ---
 apiVersion: sources.knative.dev/v1
 kind: SinkBinding

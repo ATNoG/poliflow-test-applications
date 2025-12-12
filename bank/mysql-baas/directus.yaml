@@ -11,7 +11,7 @@ metadata:
 type: Opaque
 data:
   # Replace with your MySQL credentials (base64 encoded)
-  DB_PASSWORD: b2xhYWRldXM=  # olaadeus
+  DB_PASSWORD: YWRtaW4=  # admin
   DB_USER: cm9vdA==           # root
 ---
 apiVersion: v1
