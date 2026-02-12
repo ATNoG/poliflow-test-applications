@@ -5,9 +5,9 @@ These applications deploy multiple types of workflow states (`loop`, `parallel`,
 Each application has multiple functions, deployed as Knative Services, with the corresponding allowed paths (extracted using the PoliFlow Extractor for the CNCF Serverless Workflow).
 Each application has a workflow built on top of the SonataFlow orchestrator. The workflow descriptors are saved in the `workflow/src/main/resources/` directories of each application.
 
-The applications' workflows and the allowed paths in each Knative Service can be easilly tinkered with to verify if the PoliFlow Enforcer successefully catches any deviation from the intended execution flow.
+The applications' workflows and the allowed paths in each Knative Service can be easily tinkered with to verify if the PoliFlow Enforcer successfully catches any deviation from the intended execution flow.
 For example, the user can simply change the allowed paths in a Knative Service to paths that are not achieved by executing the workflow and verify that the Enforcer blocks the execution of the Service.
-Or, on the other hand, the user can also "attack" a function, trying to send requests from a specific function's code to another function in the application (simulating an attack for example by changing the source code) and verify that requests are blocked.
+Or, on the other hand, the user can also simulate an attack to a function (for instance by changing the source code), trying to send requests from a specific function to another in the application and verify that requests are blocked.
 
 ## Deployment
 
@@ -18,3 +18,10 @@ kubectl apply -f kubernetes.yaml
 kubectl apply -f workflow/src/main/kubernetes/knative.yml
 kubectl apply -f workflow/src/main/kubernetes/kogito.yml
 ```
+
+
+## Note
+
+This version of the repository has the container images registries name redacted, as the article was submitted to a double-blind review.
+The expression `<organization>` is, therefore, to be updated with the actual organization to which we uploaded our images.
+Nevertheless, the registries can also be changed to any other and the images built (using the `build.sh` scripts) from scratch for anyone trying to reproduce our results.
