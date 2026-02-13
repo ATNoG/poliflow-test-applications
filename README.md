@@ -23,10 +23,3 @@ kubectl apply -f kubernetes.yaml
 kubectl apply -f workflow/src/main/kubernetes/knative.yml
 kubectl apply -f workflow/src/main/kubernetes/kogito.yml
 ```
-
-
-## Note
-
-This version of the repository has the container images registries name redacted, as the article was submitted to a double-blind review.
-The expression `<organization>` is, therefore, to be updated with the actual organization to which we uploaded our images.
-Nevertheless, the registries can also be changed to any other and the images built (using the `build.sh` scripts) from scratch for anyone trying to reproduce our results.
