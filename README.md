@@ -1,3 +1,8 @@
+> **ℹ️ Note**  
+> This repository is part of the **PoliFlow framework**.  
+> For more details, please refer to: [https://github.com/ATNoG/poliflow](https://github.com/ATNoG/poliflow)
+
+
 # PoliFlow Test Applications
 
 This repository holds multiple applications to validate the correct enforcement of PoliFlow allowed paths.
